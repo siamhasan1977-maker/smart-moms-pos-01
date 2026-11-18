@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Moms POS</title>
+<style>
+:root{--bg:#F6F4FA;--ink:#2A2140;--plum:#5B3FA0;--mint:#1F9E8C;--rose:#D6456B;--line:#E4DEF0;--mut:#7A7090;--star:#F2B01E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--plum);color:#fff;padding:12px 16px;display:flex;align-items:baseline;gap:10px}
+header b{font-size:19px}header span{opacity:.75;font-size:13px}
+nav{display:flex;gap:4px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--line);padding:6px 8px;position:sticky;top:0;z-index:5}
+nav button{border:0;background:none;padding:10px 14px;min-height:44px;border-radius:10px;font:inherit;color:var(--mut);white-space:nowrap;cursor:pointer}
+nav button.on{background:var(--plum);color:#fff}
+nav i{font-style:normal;background:var(--rose);color:#fff;border-radius:9px;padding:0 6px;font-size:12px;margin-left:3px}
+main{max-width:1100px;margin:0 auto;padding:14px}
+h2,h3{margin:0}h3{font-size:15px;margin-bottom:8px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:4px 0 12px;flex-wrap:wrap}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.layout{display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:start}
+.feat{position:sticky;top:64px}
+.chip{display:block;width:100%;text-align:left;border:1.5px solid var(--star);background:#FFF9E8;border-radius:10px;padding:10px 12px;min-height:46px;margin-bottom:8px;font:inherit;font-weight:600;cursor:pointer;color:var(--ink)}
+.chip small,.row small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.btn{background:var(--plum);color:#fff;border:0;border-radius:10px;padding:0 18px;min-height:44px;font:inherit;font-weight:600;cursor:pointer}
+.btn:disabled{opacity:.4;cursor:not-allowed}.btn.ok{background:var(--mint)}
+.btn.ghost{background:#fff;color:var(--rose);border:1.5px solid var(--rose)}
+.lnk{background:none;border:0;color:var(--rose);cursor:pointer;font:inherit;min-height:40px}
+.star{background:none;border:0;font-size:26px;color:#D5CFE0;cursor:pointer;min-width:44px;min-height:44px}.star.on{color:var(--star)}
+table{width:100%;border-collapse:collapse}th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:13px;color:var(--mut);font-weight:600}.r{text-align:right}.tbl{overflow-x:auto;padding:4px 8px}
+.zero{color:var(--rose);font-weight:700}
+input,select{width:100%;min-height:44px;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;background:#fff;color:var(--ink)}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--plum);outline-offset:1px}
+label{display:block;font-size:13px;color:var(--mut)}label input{margin-top:3px;color:var(--ink)}input[readonly]{background:#F1EEF7}.prow{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 44px;gap:8px;align-items:end;padding:8px 6px;border-bottom:1px solid var(--line);border-radius:8px}@media(max-width:720px){.prow{grid-template-columns:1fr 1fr 44px}.prow .nm{grid-column:1/3}.prow .x{grid-column:3;grid-row:1}.prow .qy{grid-column:1/3}}.pf{padding:10px 12px}.pfh{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:end;justify-content:space-between}.pfh>b{font-size:14px;color:var(--plum)}
+.pfd{display:flex;gap:8px}.pfd label{flex:1;min-width:130px}.pf label{font-size:11px}.pf input{min-height:34px;padding:4px 8px;font-size:13px;margin-top:2px}
+.pfm{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.pfm>div{background:var(--bg);border-radius:8px;padding:6px 10px}
+.pfm span,.pfn span{display:block;font-size:11px;color:var(--mut)}.pfm b{font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pfm .pfg{background:#EFE9FA}.pfm .pfg b{color:var(--plum)}
+.pfb{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:8px;align-items:end}
+.pfn{background:var(--plum);color:#fff;border-radius:8px;padding:6px 12px;text-align:right}.pfn span{color:#D9CFF2}.pfn b{font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}.pfn.neg{background:var(--rose)}
+@media(max-width:720px){.pfm{grid-template-columns:1fr 1fr}.pfb{grid-template-columns:1fr 1fr}.pfn{grid-column:1/-1}}
+.ogrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
+@media(max-width:720px){.ogrid{grid-template-columns:minmax(0,1fr)}}
+.ocard{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0;box-shadow:0 1px 2px rgba(42,33,64,.05);transition:box-shadow .15s,border-color .15s}
+@media(hover:hover){.ocard:hover{border-color:#CFC2EA;box-shadow:0 4px 14px rgba(91,63,160,.10)}}
+.oh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.on{display:block;font-size:16px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
+.oi{display:block;font-size:12px;color:var(--mut);margin-top:2px}
+.ob{flex:none;font-size:12px;font-weight:600;line-height:1;padding:5px 10px;border-radius:999px;color:#fff;text-transform:capitalize}
+.ob-pending{background:#D9731A}.ob-delivered{background:#2B9A6B}.ob-cancelled{background:#D64545}
+.ol{display:flex;flex-direction:column;gap:3px;padding:8px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.ot{display:flex;justify-content:space-between;gap:10px;font-size:14px}.ot span{min-width:0;overflow-wrap:anywhere}.ot b{flex:none;font-variant-numeric:tabular-nums}
+.op{display:flex;flex-direction:column;gap:3px}
+.opr{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--mut)}.opr b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.opr.rc{font-size:14px;color:var(--ink)}.opr.rc b{font-size:17px;font-weight:700}
+.oa{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.obt{flex:1 1 72px;min-height:34px;padding:0 8px;border:1px solid transparent;border-radius:8px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .12s,border-color .12s}
+.bt-ok{background:#2B9A6B;color:#fff}.bt-ok:hover{background:#228257}
+.bt-no{background:#D64545;color:#fff}.bt-no:hover{background:#BE3636}
+.bt-del{background:#FDF0F0;color:#B83232;border-color:#F5CACA}.bt-del:hover{background:#FADADA}
+.bt-ed{background:#fff;color:var(--plum);border-color:var(--plum)}.bt-ed:hover{background:#F3EEFB}
+.bt-ed:only-child{flex:0 0 auto;padding:0 22px}.pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:999px){.pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:599px){.pgrid{grid-template-columns:minmax(0,1fr)}}
+.pcard{display:flex;flex-direction:column;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0;box-shadow:0 1px 2px rgba(42,33,64,.05);transition:box-shadow .15s,border-color .15s,transform .15s}
+@media(hover:hover){.pcard:hover{border-color:#CFC2EA;box-shadow:0 4px 14px rgba(91,63,160,.10);transform:translateY(-1px)}}
+.pch{display:flex;align-items:flex-start;gap:8px}
+.pcn{flex:1;min-width:0;padding-top:6px;font-size:15px;font-weight:650;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.pact{display:flex;align-items:center;gap:4px;flex:none}
+.pcard .star{min-width:36px;min-height:36px;font-size:22px;line-height:1;border-radius:8px}.pcard .star:hover{background:#FFF7E0}
+.pedit{border:1px solid var(--line);background:#fff;color:var(--plum);border-radius:8px;padding:0 12px;min-height:36px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}.pedit:hover{background:#F3EEFB}
+.psk{display:flex;align-items:center;gap:8px}.psk .sd{width:8px;height:8px;border-radius:50%;flex:none}.psk b{font-size:22px;line-height:1;font-variant-numeric:tabular-nums}.psk small{font-size:12px}
+.pst{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:8px;border-top:1px solid var(--line)}.pst span{display:block;font-size:11px;color:var(--mut)}.pst b{font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.st-ok .sd{background:#4CB391}.st-ok small{color:#2E8B6F}
+.st-low .sd{background:#E8923A}.st-low b,.st-low small{color:#C7721C}
+.st-out .sd{background:#D64545}.st-out b,.st-out small{color:#C93A3A}
+.bo{padding:12px}.bo.bad{border-color:var(--rose);background:#FFFAFB}.brow{display:grid;grid-template-columns:1fr 90px 110px 44px;gap:8px;align-items:end;padding-top:8px}.brow select{margin-top:3px}
+.bh{display:block;font-size:12px;color:var(--mut);padding:2px 0 6px;border-bottom:1px solid var(--line)}
+@media(max-width:720px){.brow{grid-template-columns:1fr 1fr 44px}.brow .bs{grid-column:1/3}.brow .x{grid-column:3;grid-row:1}}
+.okmsg{background:#E3F6F2;border:1.5px solid var(--mint);color:#0F5F54;border-radius:10px;padding:10px 12px;margin:8px 0}
+.row{display:grid;grid-template-columns:1fr 100px 120px 44px;gap:8px;align-items:end;padding:8px 0;border-bottom:1px solid var(--line)}
+.row .nm{font-weight:600}.x{border:0;background:none;font-size:26px;color:var(--rose);min-height:44px;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}
+.warn{background:#FFE9EE;border:1.5px solid var(--rose);color:#8E1C3C;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px}
+.muted,.empty{color:var(--mut)}.empty{text-align:center;padding:36px 10px}
+.ord ul{margin:6px 0;padding-left:18px}.kv{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:14px;margin:8px 0}
+.kv span{color:var(--mut)}.acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}.acts .btn{flex:1 1 90px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.pill{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:0 14px;min-height:40px;font:inherit;cursor:pointer}.pill.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sums{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+.sums div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--mut)}.sums b{display:block;font-size:16px;color:var(--ink)}
+details{margin-bottom:10px}summary{cursor:pointer;padding:10px 0;font-weight:600}
+#modal{position:fixed;inset:0;background:rgba(42,33,64,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+#modal.on{display:flex}#modal>div{max-height:90vh;overflow:auto;background:#fff;border-radius:14px;padding:18px;width:100%;max-width:380px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;display:none;z-index:30;max-width:90%}
+@media(max-width:720px){.layout{grid-template-columns:1fr}.feat{position:static}.chip{display:inline-block;width:auto;margin-right:6px}
+.row{grid-template-columns:1fr 1fr 44px}.row .nm{grid-column:1/-1}}
+</style></head><body>
+<header><b>Smart Moms POS</b><span>Stock, sales &amp; transactions</span></header>
+<nav id="nav"></nav><main id="app"></main><div id="modal"></div><div id="toast"></div>
+<script>
+const KEY='smartmoms_pos_v1';
+let db=load();
+function migrate(){let ch=0;if(!db.costs)db.costs={};const NC={Sale:'Sell',Purchase:'Buy',Other:'Others'};db.tx.forEach(t=>{if(NC[t.cat]){if(t.cat==='Other'&&t.name==='Other expense')t.name='Others';t.cat=NC[t.cat];ch=1}});db.tx.forEach(t=>{if(!t.id){let n;do{n='T-'+String(++db.seq.t).padStart(4,'0')}while(db.tx.some(x=>x.id===n));t.id=n;ch=1}});db.tx.forEach(t=>{if(!t.pid&&(t.cat==='Sell'||t.cat==='Buy')){const p=db.products.find(x=>x.name===t.name);if(p){t.pid=p.id;ch=1}}});if(ch)save()}
+migrate();
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.products&&d.orders&&d.tx&&d.seq)return d}catch(e){}return{products:[],orders:[],tx:[],seq:{p:0,o:0,t:0}}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Could not save! Storage is blocked or full.')}}
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const r2=n=>Math.round((+n+Number.EPSILON)*100)/100, r3=n=>Math.round(n*1000)/1000;
+const num=v=>{const n=parseFloat(v);return isFinite(n)&&n>0?n:0};
+const money=n=>'\u09F3'+(+n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const q=n=>(+n||0).toLocaleString('en-IN',{maximumFractionDigits:3});
+const now=()=>new Date().toISOString();
+const fd=d=>new Date(d).toLocaleDateString('en-GB',{timeZone:'Asia/Dhaka'});
+const ld=d=>new Date(d).toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'});
+const LOW_STOCK=5;
+const nid=(k,p)=>p+String(++db.seq[k]).padStart(4,'0');
+const prod=id=>db.products.find(p=>p.id===id);
+const pend=()=>db.orders.filter(o=>o.status==='pending');
+const reserved=id=>pend().reduce((a,o)=>a+o.items.filter(i=>i.pid===id).reduce((b,i)=>b+i.qty,0),0);
+const cif=(rc,dl)=>rc>0?r2(Math.max(0,(rc-dl)/100)):0;
+const S={sale:{open:false,items:[],cust:'',receipt:'',del:''},purchase:{open:false,items:[],note:''},edit:{open:false,id:'',items:[],cust:'',receipt:'',del:''}};
+const X={open:false,from:'',to:'',view:'new',fmt:'mdy',sel:{},tsv:''};
+const M={open:false,rows:[],err:{}};
+const B={open:false,orders:[],err:{},msg:''};
+const E={Marketing:false,Transport:false,Others:false};
+const TABS=['Products','Sell','Order','Buy','Marketing','Transport','Others','Database'];
+const CATS=['Sell','Buy','Marketing','Transport','Others'];
+let tab='Products',ofilter='Pending',filter='All',busy=false,cb=null;
+
+function addTx(cat,name,desc,qty,price,amt,oid,d,pid){db.tx.push({id:nid('t','T-'),date:d||now(),cat,name,desc:desc||'',qty,price,amt,oid:oid||'',pid:pid||''})}
+function guard(){if(busy)return true;busy=true;setTimeout(()=>busy=false,500);return false}
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',3200)}
+function modal(h){$('modal').innerHTML='<div>'+h+'</div>';$('modal').classList.add('on')}
+function closeM(){$('modal').classList.remove('on')}
+function ask(msg,fn){cb=fn;modal('<p>'+esc(msg)+'</p><div class="acts"><button class="btn ghost" onclick="closeM()">No, go back</button><button class="btn" onclick="closeM();cb()">Yes</button></div>')}
+function go(t){tab=t;render()}
+
+function render(){
+ $('nav').innerHTML=TABS.map(t=>'<button class="'+(t===tab?'on':'')+'" onclick="go(\''+t+'\')">'+t+(t==='Order'&&pend().length?'<i>'+pend().length+'</i>':'')+'</button>').join('');
+ $('app').innerHTML=({Products:vProducts,Sell:()=>vPos('sale'),Order:vOrders,Buy:()=>vPos('purchase'),Marketing:()=>vEntry('Marketing'),Transport:()=>vEntry('Transport'),Others:()=>vEntry('Others'),Database:vDb})[tab]();
+ const m={Sell:'sale',Buy:'purchase'}[tab]||'';if(S[m]&&S[m].open)chk(m);if(tab==='Order'&&S.edit.open)chk('edit');if(tab==='Database'&&X.open)xu();if(tab==='Sell'&&B.open)bu();
+}
+
+/* ---------- Products ---------- */
+function vProducts(){
+ const stat=n=>n<=0?['out','Out of stock']:n<=LOW_STOCK?['low','Low stock']:['ok','In stock'];
+ const rows=db.products.map(p=>{const t=stat(p.stock);
+  return '<div class="pcard"><div class="pch"><span class="pcn" title="'+esc(p.name)+'">'+esc(p.name)+'</span><span class="pact"><button class="star '+(p.fav?'on':'')+'" aria-label="Toggle featured" aria-pressed="'+(p.fav?'true':'false')+'" title="Featured" onclick="fav(\''+p.id+'\')">\u2605</button><button class="pedit" onclick="editProd(\''+p.id+'\')">Edit</button></span></div>'+
+  '<div class="psk st-'+t[0]+'"><span class="sd"></span><b>'+q(p.stock)+'</b><small>'+t[1]+'</small></div>'+
+  '<div class="pst"><div><span>Avg buying price</span><b>'+money(p.avg)+'</b></div><div><span>Selling price</span><b>'+(p.sell>0?money(p.sell):'\u2014')+'</b></div></div></div>'}).join('');
+ return '<div class="bar"><h2>Product List</h2><div class="acts" style="margin:0"><button class="btn" onclick="addProd()">+ Add Product</button><button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="openM()">Add Multiple Products</button></div></div>'+(M.open?mPanel():'')+
+ (db.products.length?'<div class="pgrid">'+rows+'</div>':'<div class="empty">No products yet. Tap \u201CAdd Product\u201D and enter a name.</div>');
+}
+/* ---------- Bulk order ---------- */
+const bord=()=>({cust:'',items:[{pid:'',qty:'',price:''}],receipt:'',del:''});
+function openB(){B.open=!B.open;if(B.open){S.sale.open=false;B.orders=[bord()];B.err={};B.msg=''}render()}
+function bAddO(){B.orders.push(bord());render()}
+function bRmO(i){B.orders.splice(i,1);if(!B.orders.length)B.orders=[bord()];B.err={};B.msg='';render()}
+function bAddP(i){B.orders[i].items.push({pid:'',qty:'',price:''});render()}
+function bRmP(i,j){const it=B.orders[i].items;if(it.length>1)it.splice(j,1);else it[0]={pid:'',qty:'',price:''};render()}
+function bPanel(){
+ const opts=sel=>'<option value="">Select product\u2026</option>'+db.products.map(p=>'<option value="'+p.id+'"'+(p.id===sel?' selected':'')+'>'+esc(p.name)+' ('+q(p.stock)+')</option>').join('');
+ const num_=(v,h)=>'type="number" inputmode="decimal" min="0" step="any" value="'+esc(v)+'" oninput="'+h+';bu()"';
+ const cards=B.orders.map((o,i)=>{
+  const rows=o.items.map((it,j)=>{const b='B.orders['+i+'].items['+j+']';
+   return '<div class="brow"><label class="bs">Product<select onchange="'+b+'.pid=this.value;render()">'+opts(it.pid)+'</select></label>'+
+   '<label>Qty<input '+num_(it.qty,b+'.qty=this.value')+'></label><label>Unit price (\u09F3)<input '+num_(it.price,b+'.price=this.value')+'></label>'+
+   '<button class="x" aria-label="Remove product" onclick="bRmP('+i+','+j+')">\u00D7</button></div><span class="bh" id="bh-'+i+'-'+j+'"></span>'}).join('');
+  const er=B.err[i],o_='B.orders['+i+']';
+  return '<div class="card bo'+(er?' bad':'')+'"><div class="bar" style="margin:0 0 8px"><b>Order '+(i+1)+'</b><button class="lnk" onclick="bRmO('+i+')">Remove order</button></div>'+
+   '<label>Customer name<input value="'+esc(o.cust)+'" oninput="'+o_+'.cust=this.value"></label>'+rows+
+   '<div class="acts" style="margin:8px 0"><button class="btn ghost" style="color:var(--plum);border-color:var(--plum);flex:0 0 auto" onclick="bAddP('+i+')">+ Add Product</button></div>'+
+   '<div class="grid" style="margin:0"><label>Customer receipt (\u09F3)<input id="br-'+i+'" '+num_(o.receipt,o_+'.receipt=this.value')+'></label><label>Delivery charge (\u09F3)<input '+num_(o.del,o_+'.del=this.value')+'></label><label>CIF (\u09F3, auto)<input id="bc-'+i+'" readonly value="0"></label></div>'+
+   (er?'<div class="warn">'+er.map(x=>esc(x)).join('<br>')+'</div>':'')+'</div>'}).join('');
+ return (B.msg?'<div class="warn">'+esc(B.msg)+'</div>':'')+cards+'<div class="acts"><button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="bAddO()">+ Add Another Order</button><button class="btn ok" onclick="bSave()">Save All Orders</button></div>'}
+function bu(){
+ const tot={};B.orders.forEach(o=>o.items.forEach(it=>{if(it.pid)tot[it.pid]=r3((tot[it.pid]||0)+num(it.qty))}));
+ B.orders.forEach((o,i)=>{
+  const pr=o.items.some(it=>num(it.price)>0),dl=num(o.del);
+  const rc=pr?r2(o.items.reduce((a,it)=>a+r2(num(it.qty)*num(it.price)),0)):r2(num(o.receipt));
+  const re=$('br-'+i);if(re){if(pr)re.value=rc;else if(re.readOnly)re.value=o.receipt;re.readOnly=pr}
+  const c=$('bc-'+i);if(c)c.value=cif(rc,dl);
+  o.items.forEach((it,j)=>{const h=$('bh-'+i+'-'+j);if(!h)return;const p=prod(it.pid);
+   if(!p){h.textContent='';return}
+   const over=tot[it.pid]>p.stock+1e-9;h.textContent='In stock: '+q(p.stock)+(over?' \u00B7 batch total '+q(tot[it.pid])+' exceeds stock':'');h.style.color=over?'var(--rose)':''})})}
+function mkOrder(cust,items,rcStr,dl){
+ const pr=items.some(i=>i.price>0),rc=pr?r2(items.reduce((a,i)=>a+r2(i.qty*i.price),0)):r2(num(rcStr));
+ if(!pr&&rc>0)items[0].price=rc;
+ return{id:nid('o','ORD-'),date:now(),customer:cust.trim(),items:items.map(i=>({pid:i.pid,name:prod(i.pid).name,qty:i.qty,price:i.price})),receipt:rc,delivery:dl,cif:cif(rc,dl),lump:!pr&&rc>0,status:'pending'}}
+function bSave(){
+ if(busy||!B.open)return;
+ const err={},rem={},plans=[];db.products.forEach(p=>rem[p.id]=p.stock);
+ B.orders.forEach((o,i)=>{
+  const e=[],seen={},items=[];
+  if(!o.items.length)e.push('Add at least one product.');
+  o.items.forEach((it,j)=>{
+   const p=prod(it.pid);
+   if(!p){e.push('Product '+(j+1)+': select a product, or remove the row.');return}
+   if(seen[it.pid]){e.push(p.name+' is added twice. Use one row per product.');return}
+   seen[it.pid]=1;const qy=num(it.qty);
+   if(!qy){e.push(p.name+': enter a quantity above zero.');return}
+   items.push({pid:it.pid,qty:qy,price:num(it.price)})});
+  items.forEach(it=>{if(it.qty>rem[it.pid]+1e-9)e.push('Not enough stock for '+prod(it.pid).name+': need '+q(it.qty)+', available '+q(rem[it.pid])+(rem[it.pid]<prod(it.pid).stock?' (after earlier orders in this batch)':'')+'.')});
+  if(e.length){err[i]=e;return}
+  items.forEach(it=>rem[it.pid]=r3(rem[it.pid]-it.qty));
+  plans.push({o,items})});
+ const bad=Object.keys(err).map(k=>+k+1);
+ if(bad.length){B.err=err;B.msg=(bad.length===1?'Order '+bad[0]+' needs':'Orders '+bad.join(', ')+' need')+' correction. Nothing was saved.';render();return toast(B.msg)}
+ guard();
+ const made=plans.map(({o,items})=>{const ord=mkOrder(o.cust,items,o.receipt,num(o.del));
+  items.forEach(i=>{const p=prod(i.pid);p.stock=r3(p.stock-i.qty)});db.orders.push(ord);return ord});
+ B.open=false;B.orders=[];B.err={};B.msg='';save();render();
+ toast(made.length+(made.length===1?' order':' orders')+' created. See them in the Order tab')}
+function addProd(){modal('<form onsubmit="return saveProd()"><h3>Add product</h3><input id="pn" placeholder="Product name" autocomplete="off" required><div class="acts"><button type="button" class="btn ghost" onclick="closeM()">Cancel</button><button class="btn">Save product</button></div></form>');setTimeout(()=>$('pn').focus(),50)}
+function saveProd(){if(guard())return false;const n=$('pn').value.trim();if(!n)return false;
+ if(db.products.some(p=>p.name.toLowerCase()===n.toLowerCase())){toast('That product already exists');return false}
+ db.products.push({id:nid('p','P-'),name:n,stock:0,avg:0,fav:false});save();closeM();render();return false}
+const mrow=()=>({name:'',buy:'',sell:'',qty:''});
+const nk=n=>String(n).trim().replace(/\s+/g,' ').toLowerCase();
+function openM(){M.open=!M.open;if(M.open){M.rows=[mrow()];M.err={}}render()}
+function mAdd(){M.rows.push(mrow());render()}
+function mRm(i){if(M.rows.length>1)M.rows.splice(i,1);else M.rows=[mrow()];M.err={};render()}
+function mPanel(){
+ const f=(i,k,l,t,c)=>'<label'+(c?' class="'+c+'"':'')+'>'+l+'<input '+(t?'type="number" inputmode="decimal" min="0" step="any"':'type="text" autocomplete="off"')+' value="'+esc(M.rows[i][k])+'" oninput="M.rows['+i+'].'+k+'=this.value"></label>';
+ return '<div class="card"><div class="bar" style="margin-top:0"><h3 style="margin:0">Add Multiple Products</h3><button class="lnk" onclick="openM()">Close</button></div>'+
+ '<p class="muted">Each row is one new product. Initial stock is recorded as a Buy entry at the purchase price.</p>'+
+ M.rows.map((r,i)=>'<div class="prow"'+(M.err[i]?' style="background:#FFF4F7"':'')+'>'+f(i,'name','Product name',0,'nm')+f(i,'buy','Purchase price (\u09F3)',1)+f(i,'sell','Selling price (\u09F3)',1)+f(i,'qty','Initial stock',1,'qy')+'<button class="x" aria-label="Remove row" onclick="mRm('+i+')">\u00D7</button></div>'+(M.err[i]?'<div class="warn">Row '+(i+1)+': '+esc(M.err[i])+'</div>':'')).join('')+
+ '<div class="acts"><button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="mAdd()">+ Add Row</button><button class="btn" onclick="mSave()">Save All Products</button></div></div>'}
+function mSave(){
+ if(busy)return;
+ const ex=new Set(db.products.map(p=>nk(p.name))),seen={},err={},out=[];
+ M.rows.forEach((r,i)=>{
+  const name=r.name.trim().replace(/\s+/g,' '),f=[r.buy,r.sell,r.qty].map(v=>String(v).trim());
+  if(!name&&!f.some(Boolean)){err[i]='Empty row. Fill it in or remove it.';return}
+  if(!name){err[i]='Product name is required.';return}
+  const k=nk(name),first=seen[k];if(first===undefined)seen[k]=i;
+  if(ex.has(k)){err[i]='A product named \u201C'+name+'\u201D already exists.';return}
+  if(first!==undefined){err[i]='Same name as row '+(first+1)+'. Product names must be unique.';return}
+  const bad=f.findIndex(v=>v!==''&&!(isFinite(+v)&&+v>=0));
+  if(bad>=0){err[i]=['Purchase price','Selling price','Initial stock'][bad]+' must be a number, zero or more.';return}
+  const n=f.map(v=>v===''?0:+v);
+  if(n[2]>0&&f[0]===''){err[i]='Purchase price is required when initial stock is entered.';return}
+  out.push({name,buy:n[0],sell:n[1],qty:r3(n[2])})});
+ const bad=Object.keys(err).length;
+ if(bad){M.err=err;render();return toast(bad+(bad===1?' row needs':' rows need')+' fixing. Nothing was saved.')}
+ guard();const d=now();
+ out.forEach(o=>{const id=nid('p','P-');
+  db.products.push({id,name:o.name,stock:o.qty,avg:o.qty>0?Math.round(o.buy*10000)/10000:0,fav:false,sell:r2(o.sell)});
+  if(o.qty>0)addTx('Buy',o.name,'Initial stock',o.qty,o.buy,r2(o.qty*o.buy),'',d,id)});
+ M.open=false;M.rows=[];M.err={};save();render();toast(out.length+(out.length===1?' product':' products')+' added')}
+function fav(id){const p=prod(id);p.fav=!p.fav;save();render()}
+function editProd(id){const p=prod(id);modal('<form onsubmit="return saveProdEdit(\''+id+'\')"><h3>Edit product name</h3><input id="pn" value="'+esc(p.name)+'" autocomplete="off" required><div class="acts"><button type="button" class="btn ghost" onclick="closeM()">Cancel</button><button class="btn">Save name</button></div></form>');setTimeout(()=>$('pn').focus(),50)}
+function saveProdEdit(id){if(guard())return false;const n=$('pn').value.trim();if(!n)return false;
+ if(db.products.some(x=>x.id!==id&&x.name.toLowerCase()===n.toLowerCase())){toast('That product already exists');return false}
+ prod(id).name=n;db.tx.forEach(t=>{if(t.pid===id)t.name=n});db.orders.forEach(o=>o.items.forEach(i=>{if(i.pid===id)i.name=n}));
+ save();closeM();render();return false}
+
+/* ---------- Sell & Buy builder ---------- */
+function vPos(m){
+ const s=S[m],sale=m==='sale',favs=db.products.filter(p=>p.fav);
+ const left='<aside class="card feat"><h3>\u2605 Featured</h3>'+(favs.length?favs.map(p=>'<button class="chip" onclick="addItem(\''+m+'\',\''+p.id+'\')">'+esc(p.name)+'<small>'+q(p.stock)+' in stock</small></button>').join(''):'<p class="muted">Star products in the Product List to pin them here.</p>')+'</aside>';
+ let right='<div class="bar"><h2>'+(sale?'Sell':'Buy')+'</h2><div class="acts" style="margin:0"><button class="btn" onclick="toggle(\''+m+'\')">'+(s.open?'Close form':sale?'+ Add Order':'+ Add Product')+'</button>'+(sale?'<button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="openB()">'+(B.open?'Close bulk':'Bulk Order')+'</button>':'')+'</div></div>';
+ if(s.open)right+=form(m);if(sale&&B.open)right+=bPanel();
+ 
+ return '<div class="layout">'+left+'<div>'+right+'</div></div>';
+}
+function toggle(m){S[m].open=!S[m].open;if(m==='sale'&&S.sale.open)B.open=false;render()}
+function addItem(m,pid){if(!pid)return;const s=S[m];s.open=true;if(m==='sale')B.open=false;if(!s.items.some(i=>i.pid===pid))s.items.push({pid,qty:m!=='purchase'?'1':'',price:''});render()}
+function rmItem(m,i){S[m].items.splice(i,1);render()}
+function form(m){
+ const s=S[m],sale=m!=='purchase';
+ const rows=s.items.map((it,i)=>{const p=prod(it.pid);
+  return '<div class="row"><div class="nm">'+esc(p.name)+'<small>'+q(p.stock)+' in stock</small></div>'+
+  '<label>Quantity<input type="number" inputmode="decimal" min="0" step="any" value="'+esc(it.qty)+'" oninput="S.'+m+'.items['+i+'].qty=this.value;chk(\''+m+'\')"></label>'+
+  '<label>Unit price (\u09F3)<input type="number" inputmode="decimal" min="0" step="any" value="'+esc(it.price)+'" oninput="S.'+m+'.items['+i+'].price=this.value;chk(\''+m+'\')"></label>'+
+  '<button class="x" aria-label="Remove product" onclick="rmItem(\''+m+'\','+i+')">\u00D7</button></div>'}).join('')||'<p class="muted">Pick a product below, or tap a featured one.</p>';
+ const opts=db.products.filter(p=>!s.items.some(i=>i.pid===p.id)).map(p=>'<option value="'+p.id+'">'+esc(p.name)+' ('+q(p.stock)+')</option>').join('');
+ const extra=sale?'<div class="grid"><label>Customer name<input value="'+esc(s.cust)+'" oninput="S.'+m+'.cust=this.value"></label>'+
+  '<label>Customer receipt (\u09F3, auto when unit prices are set)<input id="rc-'+m+'" type="number" inputmode="decimal" min="0" step="any" value="'+esc(s.receipt)+'" oninput="S.'+m+'.receipt=this.value;chk(\''+m+'\')"></label>'+
+  '<label>Delivery charge (\u09F3, optional)<input type="number" inputmode="decimal" min="0" step="any" value="'+esc(s.del)+'" oninput="S.'+m+'.del=this.value;chk(\''+m+'\')"></label></div>'
+  :'<div class="grid"><label>Note (optional)<input value="'+esc(s.note)+'" oninput="S.purchase.note=this.value"></label></div>';
+ return '<div class="card">'+(m==='edit'?'<h3>Edit '+s.id+' ('+db.orders.find(o=>o.id===s.id).status+')</h3>':'')+rows+'<div style="margin-top:10px"><select onchange="addItem(\''+m+'\',this.value)"><option value="">+ Add product\u2026</option>'+opts+'</select></div>'+extra+
+  '<div id="warn-'+m+'"></div><div class="bar"><b id="sum-'+m+'"></b><span class="acts">'+(m==='edit'?'<button class="btn ghost" onclick="S.edit.open=false;render()">Discard</button>':'')+'<button class="btn" id="go-'+m+'" onclick="'+(m==='edit'?'subEdit()':sale?'subSale()':'subBuy()')+'">'+(m==='edit'?'Save changes':sale?'Create order':'Save Buy')+'</button></span></div></div>';
+}
+function chk(m){
+ const s=S[m];let w='',sum='';
+ if(m!=='purchase'){const pr=s.items.some(i=>num(i.price)>0),re=$('rc-'+m);
+  const rc=pr?r2(s.items.reduce((a,i)=>a+r2(num(i.qty)*num(i.price)),0)):r2(num(s.receipt));
+  if(re){if(pr)re.value=rc;else if(re.readOnly)re.value=s.receipt;re.readOnly=pr}
+  sum='Customer receipt '+money(rc)+' \u00B7 CIF '+money(cif(rc,num(s.del)));
+ }else sum='Total cost '+money(s.items.reduce((a,i)=>a+num(i.qty)*num(i.price),0));
+ const wb=$('warn-'+m),sb=$('sum-'+m),gb=$('go-'+m);if(!wb)return;
+ wb.innerHTML=w?'<div class="warn">'+w+'</div>':'';sb.textContent=sum;gb.disabled=!!w;
+}
+function subSale(){
+ if(busy)return;const s=S.sale;
+ if(!s.items.length)return toast('Add at least one product');
+ const dl=num(s.del);
+ const items=s.items.map(i=>({pid:i.pid,qty:num(i.qty),price:num(i.price)}));
+ if(items.some(i=>!i.qty))return toast('Enter a quantity for every product');
+ for(const i of items){const p=prod(i.pid);if(i.qty>p.stock)return toast('Not enough stock: '+p.name+' has '+q(p.stock))}
+ guard();
+ const pr=items.some(i=>i.price>0),rc=pr?r2(items.reduce((a,i)=>a+r2(i.qty*i.price),0)):r2(num(s.receipt));
+ if(!pr&&rc>0)items[0].price=rc;
+ const o={id:nid('o','ORD-'),date:now(),customer:s.cust.trim(),items:items.map(i=>({pid:i.pid,name:prod(i.pid).name,qty:i.qty,price:i.price})),receipt:rc,delivery:dl,cif:cif(rc,dl),lump:!pr&&rc>0,status:'pending'};
+ items.forEach(i=>{const p=prod(i.pid);p.stock=r3(p.stock-i.qty)});
+ db.orders.push(o);S.sale={open:false,items:[],cust:'',receipt:'',del:''};save();render();toast(o.id+' created. See it in the Order tab');
+}
+function subBuy(){
+ if(busy)return;const s=S.purchase;
+ if(!s.items.length)return toast('Add at least one product');
+ const it=s.items.map(i=>({pid:i.pid,qty:num(i.qty),price:num(i.price)}));
+ if(it.some(i=>!i.qty))return toast('Enter a quantity for every product');
+ guard();const d=now();
+ it.forEach(i=>{const p=prod(i.pid),base=p.stock+reserved(p.id);
+  p.avg=Math.round(((base*p.avg+i.qty*i.price)/(base+i.qty))*10000)/10000;
+  p.stock=r3(p.stock+i.qty);
+  addTx('Buy',p.name,s.note.trim(),i.qty,i.price,r2(i.qty*i.price),'',d,p.id)});
+ S.purchase={open:false,items:[],note:''};save();render();toast('Buy saved');
+}
+
+/* ---------- Orders ---------- */
+function card(o,act){
+ const b=(c,t,f)=>'<button class="obt '+c+'" onclick="'+f+'(\''+o.id+'\')">'+t+'</button>';
+ return '<div class="ocard"><div class="oh"><div><b class="on">'+esc(o.customer||'No name')+'</b><span class="oi">'+o.id+' \u00B7 '+fd(o.date)+'</span></div><span class="ob ob-'+o.status+'">'+o.status+'</span></div>'+
+ '<div class="ol">'+o.items.map(i=>'<div class="ot"><span>'+esc(i.name)+(i.price>0&&!o.lump?' <small class="muted">@ '+money(i.price)+'</small>':'')+'</span><b>\u00D7 '+q(i.qty)+'</b></div>').join('')+'</div>'+
+ '<div class="op"><div class="opr rc"><span>Customer receipt</span><b>'+money(o.receipt)+'</b></div><div class="opr"><span>Delivery charge</span><b>'+money(o.delivery)+'</b></div><div class="opr"><span>CIF</span><b>'+money(o.cif)+'</b></div></div>'+
+ '<div class="oa">'+(act?b('bt-ok','Delivered','deliver')+b('bt-no','Cancel','cancelO')+b('bt-del','Delete','delOrder'):'')+b('bt-ed','Edit','editOrder')+'</div></div>';
+}
+function vOrders(){
+ const st={Pending:'pending',Delivered:'delivered',Cancelled:'cancelled'},cnt=k=>db.orders.filter(o=>o.status===st[k]).length;
+ const list=db.orders.filter(o=>ofilter==='All'||o.status===st[ofilter]).slice().reverse();
+ return '<div class="bar"><h2>Orders</h2></div>'+(S.edit.open?form('edit'):'')+
+ '<div class="chips">'+['Pending','Delivered','Cancelled','All'].map(k=>'<button class="pill '+(k===ofilter?'on':'')+'" onclick="ofilter=\''+k+'\';render()">'+k+(k==='All'?'':' ('+cnt(k)+')')+'</button>').join('')+'</div>'+
+ (list.length?'<div class="ogrid">'+list.map(o=>card(o,o.status==='pending')).join('')+'</div>':'<p class="muted">No orders here.</p>');
+}
+function editOrder(id){const o=db.orders.find(x=>x.id===id);
+ S.edit={open:true,id,items:o.items.map(i=>({pid:i.pid,qty:String(i.qty),price:o.lump||!(i.price>0)?'':String(i.price)})),cust:o.customer,receipt:o.lump&&o.receipt>0?String(o.receipt):'',del:o.delivery>0?String(o.delivery):''};
+ tab='Order';render();window.scrollTo(0,0)}
+function subEdit(){
+ if(busy)return;const s=S.edit;
+ if(!s.items.length)return toast('Add at least one product');
+ const dl=num(s.del),items=s.items.map(i=>({pid:i.pid,qty:num(i.qty),price:num(i.price)}));
+ if(items.some(i=>!i.qty))return toast('Enter a quantity for every product');
+ guard();
+ if(tryEdit(()=>{applyOrder(db.orders.find(x=>x.id===s.id),items,s.cust.trim(),items.some(i=>i.price>0)?0:r2(num(s.receipt)),dl)})){S.edit={open:false,id:'',items:[],cust:'',receipt:'',del:''};render();toast('Order updated')}
+}
+function applyOrder(o,items,cust,rc,dl){
+ const lump=rc>0;if(lump)items[0].price=rc;else rc=r2(items.reduce((a,i)=>a+r2(i.qty*i.price),0));
+ o.customer=cust;o.items=items.map(i=>({pid:i.pid,name:prod(i.pid).name,qty:i.qty,price:i.price}));
+ o.receipt=rc;o.delivery=dl;o.cif=cif(rc,dl);o.lump=lump;
+ if(o.status==='delivered')syncTx(o);
+}
+function syncTx(o){
+ const sales=db.tx.filter(t=>t.oid===o.id&&t.cat==='Sell'),tr=db.tx.find(t=>t.oid===o.id&&t.cat==='Transport'&&t.name==='Delivery Service');
+ o.items.forEach((i,k)=>{let t=sales[k];if(!t){t={id:nid('t','T-'),date:o.closed||now(),cat:'Sell',oid:o.id};db.tx.push(t)}
+  Object.assign(t,{name:i.name,pid:i.pid,desc:o.customer,qty:i.qty,price:i.price,amt:(o.lump&&k===0)?i.price:r2(i.qty*i.price)})});
+ const extra=sales.slice(o.items.length);db.tx=db.tx.filter(t=>!extra.includes(t));
+ const a=r2(o.delivery+o.cif);let t=tr;if(!t){t={id:nid('t','T-'),date:o.closed||now(),cat:'Transport',oid:o.id};db.tx.push(t)}
+ Object.assign(t,{name:'Delivery Service',desc:o.customer||o.id,qty:1,price:a,amt:a});
+}
+function recalc(){
+ db.products.forEach(p=>{
+  const ev=db.tx.filter(t=>t.cat==='Buy'&&t.pid===p.id).map(t=>({d:t.date,b:1,q:t.qty,pr:t.price,i:t.id}));
+  let act=0;
+  db.orders.forEach(o=>{if(o.status==='cancelled')return;const q=o.items.filter(i=>i.pid===p.id).reduce((a,i)=>a+i.qty,0);if(!q)return;act+=q;if(o.status==='delivered')ev.push({d:o.closed||o.date,b:0,q:-q,i:''})});
+  ev.sort((a,b)=>(a.d>b.d)-(a.d<b.d)||b.b-a.b||(a.i>b.i)-(a.i<b.i));
+  let base=0,avg=0,bought=0;
+  ev.forEach(e=>{if(e.b){avg=(base*avg+e.q*e.pr)/(base+e.q);base=r3(base+e.q);bought+=e.q}else base=Math.max(0,r3(base+e.q))});
+  p.stock=r3(bought-act);p.avg=Math.round(avg*10000)/10000;
+ });
+}
+function tryEdit(fn){
+ const snap=JSON.stringify(db);let err;
+ try{err=fn()}catch(e){err='Could not apply the change'}
+ if(!err){recalc();const bad=db.products.find(p=>p.stock<0);if(bad)err='Not enough stock: '+bad.name+' would go to '+q(bad.stock)}
+ if(err){db=JSON.parse(snap);toast(err);return false}
+ save();return true;
+}
+function deliver(id){
+ const o=db.orders.find(x=>x.id===id);if(!o||o.status!=='pending')return;
+ const d=now();
+ o.items.forEach((i,k)=>addTx('Sell',i.name,o.customer,i.qty,i.price,(o.lump&&k===0)?i.price:r2(i.qty*i.price),o.id,d,i.pid));
+ const t=r2(o.delivery+o.cif);
+ addTx('Transport','Delivery Service',o.customer||o.id,1,t,t,o.id,d);
+ o.status='delivered';o.closed=d;save();render();toast('Marked delivered');
+}
+function cancelO(id){
+ ask('Cancel this order and return its items to stock?',()=>{
+  const o=db.orders.find(x=>x.id===id);if(!o||o.status!=='pending')return;
+  o.items.forEach(i=>{const p=prod(i.pid);if(p)p.stock=r3(p.stock+i.qty)});
+  o.status='cancelled';o.closed=now();save();render();toast('Order cancelled, stock restored')});
+}
+
+/* ---------- Marketing / Transport / Others ---------- */
+const F={Marketing:[['usd','Dollar amount ($)','n'],['rate','Dollar rate (\u09F3 per $)','n'],['desc','Description','t']],
+ Transport:[['cost','Cost name','t'],['qty','Unit / quantity','n'],['amt','Amount per unit (\u09F3)','n']],
+ Others:[['cost','Cost name','t'],['qty','Unit / quantity','n'],['amt','Unit amount (\u09F3)','n'],['desc','Description (optional)','t']]};
+function vEntry(c){
+ let h='<div class="bar"><h2>'+c+'</h2><button class="btn" onclick="E.'+c+'=!E.'+c+';render()">'+(E[c]?'Close form':'+ Add Entry')+'</button></div>';
+ if(E[c])h+='<div class="card"><div class="grid">'+F[c].map(f=>'<label>'+f[1]+'<input id="f-'+f[0]+'" '+(f[2]==='n'?'type="number" inputmode="decimal" min="0" step="any"':'type="text"')+' oninput="pv()"></label>').join('')+'</div>'+
+  (c==='Marketing'?'<p>Cost in BDT: <b id="pv">'+money(0)+'</b></p>':'')+'<button class="btn" onclick="subEntry(\''+c+'\')">Save entry</button></div>';
+ const list=db.tx.filter(t=>t.cat===c).slice(-15).reverse();
+ return h+'<h3>Recent entries</h3>'+(list.length?txTable(list):'<p class="muted">Nothing recorded yet.</p>');
+}
+function pv(){const e=$('pv');if(e)e.textContent=money(r2(num($('f-usd').value)*num($('f-rate').value)))}
+function subEntry(c){
+ if(busy)return;const v=k=>$('f-'+k)?$('f-'+k).value.trim():'';
+ if(c==='Marketing'){const usd=num(v('usd')),rate=num(v('rate'));
+  if(!usd||!rate)return toast('Enter the dollar amount and dollar rate');
+  guard();const a=r2(usd*rate);addTx('Marketing','Marketing',v('desc'),1,a,a);
+ }else{const qty=num(v('qty')),amt=num(v('amt'));
+  if(!v('cost'))return toast('Enter a cost name');
+  if(!qty||!amt)return toast('Enter quantity and amount');
+  guard();addTx(c,c==='Transport'?'Transport':'Others',c==='Others'&&v('desc')?v('cost')+' \u2013 '+v('desc'):v('cost'),qty,amt,r2(qty*amt));}
+ E[c]=false;save();render();toast('Entry saved');
+}
+
+/* ---------- Database ---------- */
+function txTable(list){
+ return '<div class="card tbl"><table><tr><th>Date</th><th>Category</th><th>Name</th><th>Description</th><th class="r">Qty</th><th class="r">Unit price</th><th class="r">Total</th><th>Order</th><th></th></tr>'+
+ list.map(t=>'<tr><td>'+fdb(t.date)+'</td><td>'+t.cat+'</td><td>'+esc(t.name)+'</td><td>'+esc(t.desc)+'</td><td class="r">'+q(t.qty)+'</td><td class="r">'+money(t.price)+'</td><td class="r">'+money(t.amt)+'</td><td>'+esc(t.oid)+'</td><td><button class="lnk" style="color:var(--plum)" onclick="editTx(\''+t.id+'\')">Edit</button>'+((!t.oid&&t.cat!=='Sell')?'<button class="lnk" onclick="delTx(\''+t.id+'\')">Delete</button>':'')+'</td></tr>').join('')+'</table></div>';
+}
+function vDb(){
+ const tot=c=>r2(db.tx.filter(t=>t.cat===c).reduce((a,t)=>a+t.amt,0));
+ const list=db.tx.filter(t=>filter==='All'||t.cat===filter).slice().reverse();
+ return '<div class="bar"><h2>Database</h2><div class="acts" style="margin:0"><button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="exp()">Backup</button><button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="$(\'imp\').click()">Restore</button><button class="btn" style="background:var(--mint)" onclick="openX()">Copy for Excel</button><button class="btn" style="background:var(--rose)" onclick="fullReset()">Full Data Reset</button><input id="imp" type="file" accept=".json" hidden onchange="imp(this)"></div></div>'+
+ (X.open?xHTML():'')+'<div class="sums">'+CATS.map(c=>'<div>'+c+'<b>'+money(tot(c))+'</b></div>').join('')+'</div>'+profitHTML()+
+ '<div class="chips">'+['All'].concat(CATS).map(c=>'<button class="pill '+(c===filter?'on':'')+'" onclick="filter=\''+c+'\';render()">'+c+'</button>').join('')+'</div>'+
+ (list.length?txTable(list):'<div class="empty">No transactions yet.</div>');
+}
+function editTx(id){
+ const t=db.tx.find(x=>x.id===id),fx=t.oid||t.pid||t.cat==='Sell'||t.cat==='Buy',ot=t.oid&&t.cat==='Transport';
+ const cats=fx?[t.cat]:['Marketing','Transport','Others'],d=x=>x?' disabled':'';
+ const dv=new Date(t.date).toLocaleDateString('en-CA',{timeZone:'Asia/Dhaka'});
+ modal('<form onsubmit="return saveTx(\''+id+'\')"><h3>Edit '+id+'</h3><div class="grid" style="grid-template-columns:1fr">'+
+ '<label>Date<input type="date" id="e-date" value="'+dv+'" data-o="'+dv+'" required></label>'+
+ '<label>Category<select id="e-cat"'+d(fx)+'>'+cats.map(c=>'<option'+(c===t.cat?' selected':'')+'>'+c+'</option>').join('')+'</select></label>'+
+ '<label>Product / cost name<input id="e-name" value="'+esc(t.name)+'"'+d(fx)+'></label>'+
+ '<label>Description'+(t.oid&&t.cat==='Sell'?' (customer name)':'')+'<input id="e-desc" value="'+esc(t.desc)+'"'+d(ot)+'></label>'+
+ '<label>Quantity<input id="e-qty" type="number" inputmode="decimal" min="0" step="any" value="'+t.qty+'"'+d(ot)+'></label>'+
+ '<label>Unit price / amount (\u09F3)<input id="e-price" type="number" inputmode="decimal" min="0" step="any" value="'+t.price+'"'+d(ot)+'></label></div>'+
+ (t.oid?'<p class="muted">Linked to '+esc(t.oid)+'. Product, category and delivery amount change through the order.</p>':t.pid?'<p class="muted">Rename the product from the Product List.</p>':'')+
+ '<div class="acts"><button type="button" class="btn ghost" onclick="closeM()">Cancel</button><button class="btn">Save changes</button></div></form>');
+}
+function saveTx(id){
+ if(guard())return false;
+ const t=db.tx.find(x=>x.id===id),g=k=>$('e-'+k).value,qty=num(g('qty')),price=num(g('price')),name=g('name').trim(),desc=g('desc').trim();
+ const de=$('e-date'),nd=de.value===de.dataset.o?t.date:new Date(de.value+'T12:00:00+06:00').toISOString();
+ const os=t.oid&&t.cat==='Sell',ot=t.oid&&t.cat==='Transport',free=!t.oid&&!t.pid&&t.cat!=='Sell'&&t.cat!=='Buy',cat=g('cat');
+ if(!ot&&(!name||!qty)){toast('Enter a name and a quantity above zero');return false}
+ if(free&&!price){toast('Enter an amount above zero');return false}
+ const ok=tryEdit(()=>{
+  const tt=db.tx.find(x=>x.id===id);
+  if(ot){tt.date=nd;return}
+  if(os){const o=db.orders.find(x=>x.id===tt.oid),k=db.tx.filter(x=>x.oid===o.id&&x.cat==='Sell').indexOf(tt);
+   if(o.lump&&k>0&&price>0)return 'Only the first product holds the customer receipt';
+   const items=o.items.map((i,j)=>({pid:i.pid,qty:j===k?qty:i.qty,price:o.lump?0:(j===k?price:i.price)}));
+   applyOrder(o,items,desc,o.lump?(k===0?price:o.receipt):0,o.delivery);
+   db.tx.find(x=>x.id===id).date=nd;return}
+  Object.assign(tt,{date:nd,desc,qty,price,amt:r2(qty*price)});
+  if(free)Object.assign(tt,{cat,name});
+ });
+ if(ok){closeM();render();toast('Entry updated')}
+ return false;
+}
+function delOrder(id){
+ ask('Delete this pending order? Its items go back to stock.',()=>{
+  const o=db.orders.find(x=>x.id===id);if(!o||o.status!=='pending')return;
+  if(tryEdit(()=>{db.orders=db.orders.filter(x=>x.id!==id);db.tx=db.tx.filter(t=>t.oid!==id)})){
+   if(S.edit.id===id)S.edit={open:false,id:'',items:[],cust:'',receipt:'',del:''};render();toast('Order deleted, stock restored')}})}
+function delTx(id){
+ const t=db.tx.find(x=>x.id===id);if(!t)return;
+ if(t.oid||t.cat==='Sell')return toast('Linked entries are managed through the order');
+ ask('Delete this '+t.cat+' entry? Totals and stock will update.',()=>{if(tryEdit(()=>{db.tx=db.tx.filter(x=>x.id!==id)})){render();toast('Entry deleted')}})}
+function fullReset(){
+ modal('<h3 style="color:var(--rose)">Full Data Reset</h3><p>This permanently deletes ALL products, orders, purchases, sales, marketing, transport and other expenses, and stock. It cannot be undone.</p><p><b>Download a JSON backup first.</b></p><div class="acts"><button type="button" class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="exp()">Download backup</button></div><label style="margin-top:12px">Type RESET to confirm<input id="rs" autocomplete="off" oninput="$(\'rsb\').disabled=this.value!==\'RESET\'"></label><div class="acts"><button type="button" class="btn ghost" onclick="closeM()">Cancel</button><button class="btn" id="rsb" style="background:var(--rose)" disabled onclick="doReset()">Erase everything</button></div>')}
+function doReset(){
+ if($('rs').value!=='RESET')return;
+ db={products:[],orders:[],tx:[],seq:{p:0,o:0,t:0}};
+ S.sale={open:false,items:[],cust:'',receipt:'',del:''};S.purchase={open:false,items:[],note:''};S.edit={open:false,id:'',items:[],cust:'',receipt:'',del:''};
+ E.Marketing=E.Transport=E.Others=false;M.open=false;M.rows=[];M.err={};B.open=false;B.orders=[];B.err={};B.msg='';filter='All';ofilter='Pending';
+ save();closeM();render();toast('All data cleared')}
+/* ---------- Excel copy & transfer tracking ---------- */
+const mdy=v=>{const a=v.split('-');return a[1]+'/'+a[2]+'/'+a[0]};
+const fdx=d=>X.fmt==='iso'?ld(d):mdy(ld(d));
+const fdb=d=>mdy(ld(d));
+function openX(){
+ if(X.open){X.open=false;return render()}
+ const nt=db.tx.filter(t=>!t.tr).map(t=>ld(t.date)).sort(),td=ld(now());
+ X.open=true;X.from=nt[0]||td;X.to=td;X.view='new';xsel();render()}
+function xrange(){
+ if(!X.from||!X.to||X.from>X.to)return null;
+ return db.tx.filter(t=>{const d=ld(t.date);return d>=X.from&&d<=X.to}).sort((a,b)=>(a.date>b.date)-(a.date<b.date)||(a.id>b.id)-(a.id<b.id))}
+function xsel(){X.sel={};(xrange()||[]).forEach(t=>{if(!t.tr)X.sel[t.id]=true})}
+function xvis(){const r=xrange()||[];return X.view==='new'?r.filter(t=>!t.tr):X.view==='done'?r.filter(t=>t.tr):r}
+function xpick(){return xvis().filter(t=>X.sel[t.id])}
+function xall(v){xvis().forEach(t=>{if(v)X.sel[t.id]=true;else delete X.sel[t.id]});render()}
+function xu(){const p=xpick(),e=$('xc');if(e)e.textContent='Selected: '+p.length+' entries \u00B7 Total '+money(r2(p.reduce((a,t)=>a+t.amt,0)))}
+function xHTML(){
+ let h='<div class="card"><div class="bar" style="margin-top:0"><h3 style="margin:0">Copy for Excel</h3><button class="lnk" onclick="openX()">Close</button></div><div class="grid"><label>From date<input type="date" value="'+esc(X.from)+'" onchange="X.from=this.value;xsel();render()"></label><label>To date<input type="date" value="'+esc(X.to)+'" onchange="X.to=this.value;xsel();render()"></label><label>Date format in Excel<select onchange="X.fmt=this.value;render()"><option value="mdy"'+(X.fmt==='mdy'?' selected':'')+'>mm/dd/yyyy</option><option value="iso"'+(X.fmt==='iso'?' selected':'')+'>yyyy-mm-dd</option></select></label></div>';
+ if(!X.from||!X.to)return h+'<div class="warn">Select both From Date and To Date.</div></div>';
+ const r=xrange();
+ if(!r)return h+'<div class="warn">Invalid date range: From Date is later than To Date.</div></div>';
+ const nt=r.filter(t=>!t.tr).length,dn=r.length-nt;
+ h+='<p>Selected Date Range: <b>'+mdy(X.from)+' \u2013 '+mdy(X.to)+'</b><br>Total Entries: '+r.length+'<br>Not Transferred: '+nt+'<br>Already Transferred: '+dn+'</p>';
+ if(nt&&dn)h+='<div class="warn"><b>Mixed Transfer Status:</b> This date range contains '+nt+' entries that have not been transferred and '+dn+' entries that were already transferred.</div>';
+ h+='<div class="chips">'+[['new','Not Transferred'],['done','Transferred'],['all','All Entries']].map(v=>'<button class="pill '+(v[0]===X.view?'on':'')+'" onclick="X.view=\''+v[0]+'\';render()">'+v[1]+'</button>').join('')+'</div>';
+ if(X.view!=='new')h+='<div class="warn">Previously transferred entries are shown here. Copying them again may create duplicates in Excel. Only ticked entries are copied.</div>';
+ const v=xvis();
+ h+='<div class="acts" style="margin:0 0 8px"><button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="xall(true)">Select All</button><button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="xall(false)">Deselect All</button></div>';
+ h+=v.length?'<div class="tbl" style="padding:0"><table><tr><th></th><th>Date</th><th>Category</th><th>Product</th><th>Description</th><th class="r">Unit</th><th class="r">Unit Price</th><th class="r">Total</th></tr>'+
+  v.map(t=>'<tr'+(t.tr?' style="opacity:.6"':'')+'><td><input type="checkbox" style="width:22px;min-height:22px" aria-label="Select entry" '+(X.sel[t.id]?'checked ':'')+'onchange="X.sel[\''+t.id+'\']=this.checked;xu()">'+(t.tr?'<small class="muted"><br>sent</small>':'')+'</td><td>'+fdx(t.date)+'</td><td>'+t.cat+'</td><td>'+esc(t.name)+'</td><td>'+esc(t.desc)+'</td><td class="r">'+q(t.qty)+'</td><td class="r">'+q(r2(t.price))+'</td><td class="r">'+q(r2(t.amt))+'</td></tr>').join('')+'</table></div>':'<p class="muted">No entries in this view.</p>';
+ return h+'<p><b id="xc"></b></p><div id="xmsg"></div><div class="acts"><button class="btn" onclick="copyX()">Copy Selected Entries for Excel</button><button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="csvX()">Download CSV</button></div><div class="acts"><button class="btn ok" onclick="markX()">Mark Selected as Transferred</button></div><p class="muted">Copying does not change transfer status. Paste into Excel first, then tap \u201CMark Selected as Transferred\u201D. The headers are not copied.</p></div>'}
+function cell(v){if(typeof v==='number')return String(v);v=String(v==null?'':v).replace(/[\t\r\n]+/g,' ').trim();return /^[=+\-@]/.test(v)?' '+v:v}
+function xrows(){return xpick().map(t=>[fdx(t.date),t.cat,t.name,t.desc,r3(t.qty),r2(t.price),r2(t.amt)])}
+function xmsg(h,c){const e=$('xmsg');if(e)e.innerHTML='<div class="'+c+'">'+h+'</div>'}
+async function copyX(){
+ const rows=xrows();if(!rows.length)return toast('Select at least one entry');
+ const tsv=rows.map(r=>r.map(cell).join('\t')).join('\n');let ok=false;
+ try{await navigator.clipboard.writeText(tsv);ok=true}catch(e){}
+ if(!ok){try{const a=document.createElement('textarea');a.value=tsv;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();ok=document.execCommand('copy');a.remove()}catch(e){}}
+ if(ok){const m=rows.length+' entries copied successfully. Now paste them into your Excel Database sheet.';xmsg(m,'okmsg');toast(m)}
+ else{X.tsv=tsv;modal('<h3>Could not copy automatically</h3><p>Your browser blocked clipboard access. Press and hold in the box, choose Select all, then Copy. Or download the CSV instead.</p><textarea readonly style="width:100%;height:140px" onfocus="this.select()">'+esc(tsv)+'</textarea><div class="acts"><button class="btn ghost" style="color:var(--plum);border-color:var(--plum)" onclick="csvX()">Download CSV</button><button class="btn" onclick="closeM()">Close</button></div>')}}
+function csvX(){
+ const rows=xrows();if(!rows.length)return toast('Select at least one entry');
+ const f=v=>{v=cell(v);return /[",]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+ const csv=[['Date','Category','Product','Description','Unit','Unit Price','Total']].concat(rows).map(r=>r.map(f).join(',')).join('\r\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));a.download='smartmoms-excel-'+X.from+'_to_'+X.to+'.csv';a.click();toast(rows.length+' entries downloaded as CSV')}
+function markX(){
+ const p=xpick();if(!p.length)return toast('Select at least one entry');
+ const ids=p.map(t=>t.id);
+ ask('Mark '+ids.length+' selected '+(ids.length===1?'entry':'entries')+' as Transferred? Only do this after pasting into Excel.',()=>{
+  ids.forEach(id=>{const t=db.tx.find(x=>x.id===id);if(t)t.tr=true});X.sel={};save();render();toast(ids.length+' entries marked as Transferred')})}
+function profitCalc(from,to){
+ const dl=new Set(db.orders.filter(o=>o.status==='delivered').map(o=>o.id));
+ let sell=0,del=0,cogs=0;
+ db.tx.forEach(t=>{
+  if(!t.oid||!dl.has(t.oid))return;const d=ld(t.date);if(d<from||d>to)return;
+  if(t.cat==='Sell'){sell+=t.amt;const p=prod(t.pid)||db.products.find(x=>x.name===t.name);cogs+=t.qty*(p?p.avg:0)}
+  else if(t.cat==='Transport'&&t.name==='Delivery Service')del+=t.amt});
+ sell=r2(sell);del=r2(del);cogs=r2(cogs);
+ return{sell,del,cogs,gross:r2(sell-del-cogs)}}
+function pfRange(){
+ const r=db.prange||{},td=ld(now()),first=db.tx.filter(t=>t.cat==='Sell'&&t.oid).map(t=>ld(t.date)).sort()[0]||td;
+ return{from:r.from!==undefined?r.from:first,to:r.to!==undefined?r.to:td}}
+function pfSet(k,v){db.prange=Object.assign({},pfRange());db.prange[k]=v;save();render()}
+function pfNetHTML(){
+ const r=pfRange(),ok=r.from&&r.to&&r.from<=r.to;
+ if(!ok)return{h:'<span>Net Profit</span><b>\u2014</b>',neg:false};
+ const c=profitCalc(r.from,r.to),ad=r2(num(($('pf-ad')||{}).value)),ot=r2(num(($('pf-ot')||{}).value)),n=r2(c.gross-ad-ot);
+ return{h:'<span>Net Profit</span><b>'+money(n)+'</b>',neg:n<0}}
+function pfNet(){const e=$('pf-net');if(!e)return;const n=pfNetHTML();e.innerHTML=n.h;e.className='pfn'+(n.neg?' neg':'')}
+function pfCost(){
+ const r=pfRange();if(!(r.from&&r.to&&r.from<=r.to))return;
+ db.costs=db.costs||{};const ad=r2(num($('pf-ad').value)),ot=r2(num($('pf-ot').value)),k=r.from+'|'+r.to;
+ if(ad||ot)db.costs[k]={ad,other:ot};else delete db.costs[k];
+ save();pfNet()}
+function profitHTML(){
+ const r=pfRange(),ok=r.from&&r.to&&r.from<=r.to,c=ok?profitCalc(r.from,r.to):null,co=(ok&&db.costs&&db.costs[r.from+'|'+r.to])||{ad:0,other:0};
+ const m=(l,v,x)=>'<div'+(x||'')+'><span>'+l+'</span><b>'+(ok?money(v):'\u2014')+'</b></div>';
+ const n=ok?{h:'<span>Net Profit</span><b>'+money(r2(c.gross-co.ad-co.other))+'</b>',neg:r2(c.gross-co.ad-co.other)<0}:pfNetHTML();
+ const inp=(id,v)=>'<input id="'+id+'" type="number" inputmode="decimal" min="0" step="any" value="'+(v>0?v:'')+'" placeholder="0"'+(ok?'':' disabled')+' oninput="pfCost()">';
+ return '<div class="card pf"><div class="pfh"><b>Profit Summary</b><div class="pfd"><label>From<input type="date" value="'+esc(r.from)+'" onchange="pfSet(\'from\',this.value)"></label><label>To<input type="date" value="'+esc(r.to)+'" onchange="pfSet(\'to\',this.value)"></label></div></div>'+
+ (r.from&&r.to&&!ok?'<div class="warn" style="margin:8px 0 0">From date is after To date.</div>':'')+
+ '<div class="pfm">'+m('Total Sell',c&&c.sell)+m('Delivery Cost',c&&c.del)+m('COGS',c&&c.cogs)+m('Gross Profit',c&&c.gross,' class="pfg"')+'</div>'+
+ '<div class="pfb"><label>Advertising Cost (\u09F3)'+inp('pf-ad',co.ad)+'</label><label>Other Cost (\u09F3)'+inp('pf-ot',co.other)+'</label><div class="pfn'+(n.neg?' neg':'')+'" id="pf-net">'+n.h+'</div></div></div>'}
+function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db)],{type:'application/json'}));a.download='smartmoms-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()}
+function imp(el){const f=el.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.products||!d.orders||!d.tx||!d.seq)throw 0;
+  ask('Replace ALL current data with this backup?',()=>{db=d;migrate();save();render();toast('Backup restored')})}catch(e){toast('That file is not a valid backup')}};
+ r.readAsText(f);el.value=''}
+render();
+</script></body></html>
